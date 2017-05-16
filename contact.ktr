@@ -340,96 +340,6 @@
     </step>
 
   <step>
-    <name>Mobile</name>
-    <type>DBJoin</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>source</connection>
-    <rowlimit>1</rowlimit>
-    <sql>SELECT phone as mobile FROM civicrm_phone&#xa;where phone_type_id &#x3d; 2 and contact_id &#x3d; &#x3f;&#xa;order by is_primary desc, id limit 0,1</sql>
-    <outer_join>Y</outer_join>
-    <replace_vars>N</replace_vars>
-    <parameter>
-      <field>
-        <name>id</name>
-        <type>Integer</type>
-      </field>
-    </parameter>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>112</xloc>
-      <yloc>176</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Reservasjonsregisteret i Br&#xf8;nn&#xf8;ysund</name>
-    <type>DBJoin</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>source</connection>
-    <rowlimit>1</rowlimit>
-    <sql>SELECT &#xa;&#x60;har_kontakten_reservert_seg_mot__164&#x60; as reserved_cold_mail,&#xa;&#x60;har_kontakten_reservert_seg_mot__165&#x60; as reserved_cold_phone,&#xa;&#x60;har_kontakten_reservert_seg_mot__166&#x60; as reserved_humantarian_organisations,&#xa;&#x60;n_r_ble_denne_informasjonen_sist_167&#x60; as reserved_last_updated&#xa;FROM &#x60;civicrm_value_reservasjonsregisteret_i_br_nn_ysund_1605&#x60;&#xa;where entity_id &#x3d; &#x3f;</sql>
-    <outer_join>Y</outer_join>
-    <replace_vars>N</replace_vars>
-    <parameter>
-      <field>
-        <name>id</name>
-        <type>Integer</type>
-      </field>
-    </parameter>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>560</xloc>
-      <yloc>176</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>primary_contact_for_communication</name>
-    <type>DBJoin</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>source</connection>
-    <rowlimit>1</rowlimit>
-    <sql>SELECT &#xa;&#x60;primary_contact_for_communicatio_162&#x60; as primary_contact_for_communication&#xa;FROM &#x60;civicrm_value_takkebrevspreferanse_6&#x60;&#xa;where entity_id &#x3d; &#x3f;</sql>
-    <outer_join>Y</outer_join>
-    <replace_vars>N</replace_vars>
-    <parameter>
-      <field>
-        <name>id</name>
-        <type>Integer</type>
-      </field>
-    </parameter>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>848</xloc>
-      <yloc>176</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
     <name>Insert &#x2f; Update</name>
     <type>InsertUpdate</type>
     <description/>
@@ -837,6 +747,36 @@
     </step>
 
   <step>
+    <name>Mobile</name>
+    <type>DBJoin</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>source</connection>
+    <rowlimit>1</rowlimit>
+    <sql>SELECT phone as mobile FROM civicrm_phone&#xa;where phone_type_id &#x3d; 2 and contact_id &#x3d; &#x3f;&#xa;order by is_primary desc, id limit 0,1</sql>
+    <outer_join>Y</outer_join>
+    <replace_vars>N</replace_vars>
+    <parameter>
+      <field>
+        <name>id</name>
+        <type>Integer</type>
+      </field>
+    </parameter>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>112</xloc>
+      <yloc>176</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
     <name>Null if prefix_id &#x3d; 0</name>
     <type>NullIf</type>
     <description/>
@@ -857,6 +797,66 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>256</xloc>
       <yloc>352</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Reservasjonsregisteret i Br&#xf8;nn&#xf8;ysund</name>
+    <type>DBJoin</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>source</connection>
+    <rowlimit>1</rowlimit>
+    <sql>SELECT &#xa;&#x60;har_kontakten_reservert_seg_mot__164&#x60; as reserved_cold_mail,&#xa;&#x60;har_kontakten_reservert_seg_mot__165&#x60; as reserved_cold_phone,&#xa;&#x60;har_kontakten_reservert_seg_mot__166&#x60; as reserved_humantarian_organisations,&#xa;&#x60;n_r_ble_denne_informasjonen_sist_167&#x60; as reserved_last_updated&#xa;FROM &#x60;civicrm_value_reservasjonsregisteret_i_br_nn_ysund_1605&#x60;&#xa;where entity_id &#x3d; &#x3f;</sql>
+    <outer_join>Y</outer_join>
+    <replace_vars>N</replace_vars>
+    <parameter>
+      <field>
+        <name>id</name>
+        <type>Integer</type>
+      </field>
+    </parameter>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>560</xloc>
+      <yloc>176</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>primary_contact_for_communication</name>
+    <type>DBJoin</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>source</connection>
+    <rowlimit>1</rowlimit>
+    <sql>SELECT &#xa;&#x60;primary_contact_for_communicatio_162&#x60; as primary_contact_for_communication&#xa;FROM &#x60;civicrm_value_takkebrevspreferanse_6&#x60;&#xa;where entity_id &#x3d; &#x3f;</sql>
+    <outer_join>Y</outer_join>
+    <replace_vars>N</replace_vars>
+    <parameter>
+      <field>
+        <name>id</name>
+        <type>Integer</type>
+      </field>
+    </parameter>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>848</xloc>
+      <yloc>176</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
