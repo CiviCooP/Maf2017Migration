@@ -162,7 +162,7 @@
       <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>Y</attribute></attribute>
       <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
       <attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute>
-      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>N</attribute></attribute>
+      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>
       <attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute>
       <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
     </attributes>
@@ -174,9 +174,10 @@
   <hop> <from>Address</from><to>Contact source</to><enabled>Y</enabled> </hop>
   <hop> <from>Contact source</from><to>Reservasjonsregisteret i Br&#xf8;nn&#xf8;ysund</to><enabled>Y</enabled> </hop>
   <hop> <from>Reservasjonsregisteret i Br&#xf8;nn&#xf8;ysund</from><to>primary_contact_for_communication</to><enabled>Y</enabled> </hop>
+  <hop> <from>Add is_processed</from><to>If field is null set 0</to><enabled>Y</enabled> </hop>
   <hop> <from>primary_contact_for_communication</from><to>Add is_processed</to><enabled>Y</enabled> </hop>
-  <hop> <from>Add is_processed</from><to>Null if prefix_id &#x3d; 0</to><enabled>Y</enabled> </hop>
-  <hop> <from>Null if prefix_id &#x3d; 0</from><to>Insert &#x2f; Update</to><enabled>Y</enabled> </hop>
+  <hop> <from>If field is null set 0</from><to>Force Date field type</to><enabled>Y</enabled> </hop>
+  <hop> <from>Force Date field type</from><to>Insert &#x2f; Update</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>Add is_processed</name>
@@ -217,8 +218,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>96</xloc>
-      <yloc>352</yloc>
+      <xloc>816</xloc>
+      <yloc>272</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -340,8 +341,8 @@
     </step>
 
   <step>
-    <name>Mobile</name>
-    <type>DBJoin</type>
+    <name>Force Date field type</name>
+    <type>SelectValues</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -350,28 +351,78 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <connection>source</connection>
-    <rowlimit>1</rowlimit>
-    <sql>SELECT phone as mobile FROM civicrm_phone&#xa;where phone_type_id &#x3d; 2 and contact_id &#x3d; &#x3f;&#xa;order by is_primary desc, id limit 0,1</sql>
-    <outer_join>Y</outer_join>
-    <replace_vars>N</replace_vars>
-    <parameter>
-      <field>
-        <name>id</name>
-        <type>Integer</type>
-      </field>
-    </parameter>
-     <cluster_schema/>
+    <fields>        <select_unspecified>N</select_unspecified>
+      <meta>        <name>created_date</name>
+        <rename>created_date</rename>
+        <type>Date</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>modified_date</name>
+        <rename>modified_date</rename>
+        <type>Date</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>reserved_last_updated</name>
+        <rename>reserved_last_updated</rename>
+        <type>Date</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>contact_source_date</name>
+        <rename>contact_source_date</rename>
+        <type>Date</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>112</xloc>
-      <yloc>176</yloc>
+      <xloc>400</xloc>
+      <yloc>272</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
-    <name>Reservasjonsregisteret i Br&#xf8;nn&#xf8;ysund</name>
-    <type>DBJoin</type>
+    <name>If field is null set 0</name>
+    <type>NullIf</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -380,51 +431,24 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <connection>source</connection>
-    <rowlimit>1</rowlimit>
-    <sql>SELECT &#xa;&#x60;har_kontakten_reservert_seg_mot__164&#x60; as reserved_cold_mail,&#xa;&#x60;har_kontakten_reservert_seg_mot__165&#x60; as reserved_cold_phone,&#xa;&#x60;har_kontakten_reservert_seg_mot__166&#x60; as reserved_humantarian_organisations,&#xa;&#x60;n_r_ble_denne_informasjonen_sist_167&#x60; as reserved_last_updated&#xa;FROM &#x60;civicrm_value_reservasjonsregisteret_i_br_nn_ysund_1605&#x60;&#xa;where entity_id &#x3d; &#x3f;</sql>
-    <outer_join>Y</outer_join>
-    <replace_vars>N</replace_vars>
-    <parameter>
+    <fields>
       <field>
-        <name>id</name>
-        <type>Integer</type>
-      </field>
-    </parameter>
+        <name>prefix_id</name>
+        <value>0</value>
+        </field>
+      <field>
+        <name>suffix_id</name>
+        <value>0</value>
+        </field>
+      <field>
+        <name>gender_id</name>
+        <value>0</value>
+        </field>
+      </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>560</xloc>
-      <yloc>176</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>primary_contact_for_communication</name>
-    <type>DBJoin</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>source</connection>
-    <rowlimit>1</rowlimit>
-    <sql>SELECT &#xa;&#x60;primary_contact_for_communicatio_162&#x60; as primary_contact_for_communication&#xa;FROM &#x60;civicrm_value_takkebrevspreferanse_6&#x60;&#xa;where entity_id &#x3d; &#x3f;</sql>
-    <outer_join>Y</outer_join>
-    <replace_vars>N</replace_vars>
-    <parameter>
-      <field>
-        <name>id</name>
-        <type>Integer</type>
-      </field>
-    </parameter>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>848</xloc>
-      <yloc>176</yloc>
+      <yloc>272</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -818,27 +842,27 @@
         <update>Y</update>
       </value>
       <value>
-        <name>new_contact_id</name>
-        <rename>new_contact_id</rename>
-        <update>N</update>
-      </value>
-      <value>
         <name>is_processed</name>
         <rename>is_processed</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>new_contact_id</name>
+        <rename>new_contact_id</rename>
         <update>Y</update>
       </value>
     </lookup>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>992</xloc>
-      <yloc>352</yloc>
+      <xloc>400</xloc>
+      <yloc>400</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
-    <name>Null if prefix_id &#x3d; 0</name>
-    <type>NullIf</type>
+    <name>Mobile</name>
+    <type>DBJoin</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -847,16 +871,81 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <fields>
+    <connection>source</connection>
+    <rowlimit>1</rowlimit>
+    <sql>SELECT phone as mobile FROM civicrm_phone&#xa;where phone_type_id &#x3d; 2 and contact_id &#x3d; &#x3f;&#xa;order by is_primary desc, id limit 0,1</sql>
+    <outer_join>Y</outer_join>
+    <replace_vars>N</replace_vars>
+    <parameter>
       <field>
-        <name>prefix_id</name>
-        <value>0</value>
-        </field>
-      </fields>
+        <name>id</name>
+        <type>Integer</type>
+      </field>
+    </parameter>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>256</xloc>
-      <yloc>352</yloc>
+      <xloc>112</xloc>
+      <yloc>176</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Reservasjonsregisteret i Br&#xf8;nn&#xf8;ysund</name>
+    <type>DBJoin</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>source</connection>
+    <rowlimit>1</rowlimit>
+    <sql>SELECT &#xa;&#x60;har_kontakten_reservert_seg_mot__164&#x60; as reserved_cold_mail,&#xa;&#x60;har_kontakten_reservert_seg_mot__165&#x60; as reserved_cold_phone,&#xa;&#x60;har_kontakten_reservert_seg_mot__166&#x60; as reserved_humantarian_organisations,&#xa;&#x60;n_r_ble_denne_informasjonen_sist_167&#x60; as reserved_last_updated&#xa;FROM &#x60;civicrm_value_reservasjonsregisteret_i_br_nn_ysund_1605&#x60;&#xa;where entity_id &#x3d; &#x3f;</sql>
+    <outer_join>Y</outer_join>
+    <replace_vars>N</replace_vars>
+    <parameter>
+      <field>
+        <name>id</name>
+        <type>Integer</type>
+      </field>
+    </parameter>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>560</xloc>
+      <yloc>176</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>primary_contact_for_communication</name>
+    <type>DBJoin</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>source</connection>
+    <rowlimit>1</rowlimit>
+    <sql>SELECT &#xa;&#x60;primary_contact_for_communicatio_162&#x60; as primary_contact_for_communication&#xa;FROM &#x60;civicrm_value_takkebrevspreferanse_6&#x60;&#xa;where entity_id &#x3d; &#x3f;</sql>
+    <outer_join>Y</outer_join>
+    <replace_vars>N</replace_vars>
+    <parameter>
+      <field>
+        <name>id</name>
+        <type>Integer</type>
+      </field>
+    </parameter>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>816</xloc>
+      <yloc>176</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
