@@ -519,6 +519,14 @@
           <column_name>notification_for_bank</column_name>
           <stream_name>notification_for_bank</stream_name>
         </field>
+        <field>
+          <column_name>id</column_name>
+          <stream_name>recur_id</stream_name>
+        </field>
+        <field>
+          <column_name>payment_type_id</column_name>
+          <stream_name>payment_type_id</stream_name>
+        </field>
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
