@@ -177,39 +177,6 @@
   <hop> <from>Check Number</from><to>Insert &#x2f; Update</to><enabled>Y</enabled> </hop>
   </order>
   <step>
-    <name>Add standalone</name>
-    <type>Constant</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <fields>
-      <field>
-        <name>type</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif>standalone</nullif>
-        <length>-1</length>
-        <precision>-1</precision>
-        <set_empty_string>N</set_empty_string>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>720</xloc>
-      <yloc>32</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
     <name>Add constants</name>
     <type>Constant</type>
     <description/>
@@ -255,6 +222,39 @@
     </step>
 
   <step>
+    <name>Add standalone</name>
+    <type>Constant</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>
+      <field>
+        <name>type</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>standalone</nullif>
+        <length>-1</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>720</xloc>
+      <yloc>32</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
     <name>Check Number</name>
     <type>SetValueConstant</type>
     <description/>
@@ -294,7 +294,7 @@
            <schema_name/>
            </partitioning>
     <connection>source</connection>
-    <sql>SELECT rec.payment_type_id, don.&#x2a;&#xa;&#xa;FROM civicrm_contribution don&#xa;JOIN civicrm_contact cc ON don.contact_id &#x3d; cc.id&#xa;LEFT JOIN civicrm_contribution_recur_offline rec ON don.contribution_recur_id &#x3d; rec.recur_id&#xa;&#xa;WHERE cc.is_deleted &#x3d; 0 &#xa;AND don.is_test &#x3d; 0&#xa;AND &#x28;don.contribution_recur_id IS NULL OR rec.payment_type_id &#x3d; 1&#x29;&#xa;</sql>
+    <sql>SELECT rec.payment_type_id, don.&#x2a;&#xa;&#xa;FROM civicrm_contribution don&#xa;JOIN civicrm_contact cc ON don.contact_id &#x3d; cc.id&#xa;LEFT JOIN civicrm_contribution_recur_offline rec ON don.contribution_recur_id &#x3d; rec.recur_id&#xa;&#xa;WHERE cc.is_deleted &#x3d; 0 &#xa;AND don.is_test &#x3d; 0&#xa;AND don.contribution_status_id &#x3c;&#x3e; 2&#xa;AND &#x28;don.contribution_recur_id IS NULL OR rec.payment_type_id &#x3d; 1&#x29;&#xa;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
@@ -352,85 +352,6 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>432</xloc>
       <yloc>32</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>New Contact Found</name>
-    <type>FilterRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-<send_true_to>Add standalone</send_true_to>
-<send_false_to>No New Contact Error</send_false_to>
-    <compare>
-<condition>
- <negated>N</negated>
- <leftvalue>new_contact_id</leftvalue>
- <function>&#x3c;&#x3e;</function>
- <rightvalue/>
- <value><name>constant</name><type>Integer</type><text>0</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>&#x23;&#x3b;-&#x23;</mask></value> </condition>
-    </compare>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>592</xloc>
-      <yloc>32</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>No New Contact Error</name>
-    <type>TableOutput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>destination</connection>
-    <schema/>
-    <table>error_contribution_migration</table>
-    <commit>1000</commit>
-    <truncate>N</truncate>
-    <ignore_errors>N</ignore_errors>
-    <use_batch>Y</use_batch>
-    <specify_fields>Y</specify_fields>
-    <partitioning_enabled>N</partitioning_enabled>
-    <partitioning_field/>
-    <partitioning_daily>N</partitioning_daily>
-    <partitioning_monthly>Y</partitioning_monthly>
-    <tablename_in_field>N</tablename_in_field>
-    <tablename_field/>
-    <tablename_in_table>Y</tablename_in_table>
-    <return_keys>N</return_keys>
-    <return_field/>
-    <fields>
-        <field>
-          <column_name>error_message</column_name>
-          <stream_name>no_new_contact</stream_name>
-        </field>
-        <field>
-          <column_name>source_contact_id</column_name>
-          <stream_name>contact_id</stream_name>
-        </field>
-        <field>
-          <column_name>source_contribution_id</column_name>
-          <stream_name>id</stream_name>
-        </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>592</xloc>
-      <yloc>160</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -598,6 +519,85 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>1040</xloc>
       <yloc>32</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>New Contact Found</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<send_true_to>Add standalone</send_true_to>
+<send_false_to>No New Contact Error</send_false_to>
+    <compare>
+<condition>
+ <negated>N</negated>
+ <leftvalue>new_contact_id</leftvalue>
+ <function>&#x3c;&#x3e;</function>
+ <rightvalue/>
+ <value><name>constant</name><type>Integer</type><text>0</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>&#x23;&#x3b;-&#x23;</mask></value> </condition>
+    </compare>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>592</xloc>
+      <yloc>32</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>No New Contact Error</name>
+    <type>TableOutput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>destination</connection>
+    <schema/>
+    <table>error_contribution_migration</table>
+    <commit>1000</commit>
+    <truncate>N</truncate>
+    <ignore_errors>N</ignore_errors>
+    <use_batch>Y</use_batch>
+    <specify_fields>Y</specify_fields>
+    <partitioning_enabled>N</partitioning_enabled>
+    <partitioning_field/>
+    <partitioning_daily>N</partitioning_daily>
+    <partitioning_monthly>Y</partitioning_monthly>
+    <tablename_in_field>N</tablename_in_field>
+    <tablename_field/>
+    <tablename_in_table>Y</tablename_in_table>
+    <return_keys>N</return_keys>
+    <return_field/>
+    <fields>
+        <field>
+          <column_name>error_message</column_name>
+          <stream_name>no_new_contact</stream_name>
+        </field>
+        <field>
+          <column_name>source_contact_id</column_name>
+          <stream_name>contact_id</stream_name>
+        </field>
+        <field>
+          <column_name>source_contribution_id</column_name>
+          <stream_name>id</stream_name>
+        </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>592</xloc>
+      <yloc>160</yloc>
       <draw>Y</draw>
       </GUI>
     </step>

@@ -476,7 +476,7 @@
            <schema_name/>
            </partitioning>
     <connection>source</connection>
-    <sql>SELECT rec.payment_type_id, don.&#x2a;&#xa;&#xa;FROM civicrm_contribution don&#xa;JOIN civicrm_contact cc ON don.contact_id &#x3d; cc.id&#xa;LEFT JOIN civicrm_contribution_recur_offline rec ON don.contribution_recur_id &#x3d; rec.recur_id&#xa;&#xa;WHERE cc.is_deleted &#x3d; 0 &#xa;AND don.contribution_recur_id IS NOT NULL &#xa;AND rec.payment_type_id IN &#x28;2,3&#x29;&#xa;AND don.is_test &#x3d; 0</sql>
+    <sql>SELECT rec.payment_type_id, don.&#x2a;&#xa;&#xa;FROM civicrm_contribution don&#xa;JOIN civicrm_contact cc ON don.contact_id &#x3d; cc.id&#xa;LEFT JOIN civicrm_contribution_recur_offline rec ON don.contribution_recur_id &#x3d; rec.recur_id&#xa;&#xa;WHERE cc.is_deleted &#x3d; 0 &#xa;AND don.contribution_recur_id IS NOT NULL &#xa;AND rec.payment_type_id IN &#x28;2,3&#x29;&#xa;AND don.is_test &#x3d; 0&#xa;AND don.contribution_status_id &#x3c;&#x3e; 2</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
