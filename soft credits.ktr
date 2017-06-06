@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <transformation>
   <info>
-    <name>recurring</name>
+    <name>soft credits</name>
     <description/>
     <extended_description/>
     <trans_version/>
@@ -168,13 +168,14 @@
     </attributes>
   </connection>
   <order>
-  <hop> <from>Avtale&#x3f;</from><to>Set avtale</to><enabled>Y</enabled> </hop>
-  <hop> <from>Avtale&#x3f;</from><to>Set printed</to><enabled>Y</enabled> </hop>
-  <hop> <from>Set avtale</from><to>Lookup payment instrument</to><enabled>Y</enabled> </hop>
-  <hop> <from>Set printed</from><to>Lookup payment instrument</to><enabled>Y</enabled> </hop>
-  <hop> <from>Lookup payment instrument</from><to>Write migration recur</to><enabled>Y</enabled> </hop>
-  <hop> <from>Recurring Contributions</from><to>Add constants</to><enabled>Y</enabled> </hop>
-  <hop> <from>Add constants</from><to>Avtale&#x3f;</to><enabled>Y</enabled> </hop>
+  <hop> <from>Soft Credits</from><to>Add constants</to><enabled>Y</enabled> </hop>
+  <hop> <from>Add constants</from><to>Find New Contact</to><enabled>Y</enabled> </hop>
+  <hop> <from>Find New Contact</from><to>New Contact Found</to><enabled>Y</enabled> </hop>
+  <hop> <from>New Contact Found</from><to>No New Contact Error</to><enabled>Y</enabled> </hop>
+  <hop> <from>New Contact Found</from><to>Find New Contribution</to><enabled>Y</enabled> </hop>
+  <hop> <from>Find New Contribution</from><to>New Contribution Found</to><enabled>Y</enabled> </hop>
+  <hop> <from>New Contribution Found</from><to>No New Contribution Error</to><enabled>Y</enabled> </hop>
+  <hop> <from>New Contribution Found</from><to>Add Soft</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>Add constants</name>
@@ -189,13 +190,37 @@
            </partitioning>
     <fields>
       <field>
-        <name>payment_option_group_id</name>
-        <type>Integer</type>
+        <name>source_identity_name</name>
+        <type>String</type>
         <format/>
         <currency/>
         <decimal/>
         <group/>
-        <nullif>10</nullif>
+        <nullif>original_contact_id</nullif>
+        <length>-1</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_new_contact</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>No new contact ID found with source contact id</nullif>
+        <length>-1</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_new_contribution</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>No new contribution ID found with source contribution id</nullif>
         <length>-1</length>
         <precision>-1</precision>
         <set_empty_string>N</set_empty_string>
@@ -203,43 +228,40 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>256</xloc>
+      <xloc>288</xloc>
       <yloc>32</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
-    <name>Avtale&#x3f;</name>
-    <type>FilterRows</type>
+    <name>Soft Credits</name>
+    <type>TableInput</type>
     <description/>
-    <distribute>Y</distribute>
+    <distribute>N</distribute>
     <custom_distribution/>
     <copies>1</copies>
          <partitioning>
            <method>none</method>
            <schema_name/>
            </partitioning>
-<send_true_to>Set avtale</send_true_to>
-<send_false_to>Set printed</send_false_to>
-    <compare>
-<condition>
- <negated>N</negated>
- <leftvalue>payment_type_id</leftvalue>
- <function>&#x3d;</function>
- <rightvalue/>
- <value><name>constant</name><type>Integer</type><text>2</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>&#x23;&#x3b;-&#x23;</mask></value> </condition>
-    </compare>
+    <connection>source</connection>
+    <sql>SELECT sc.&#x2a;&#xa;&#xa;FROM civicrm_contribution_soft sc&#xa;JOIN civicrm_contact cc ON sc.contact_id &#x3d; cc.id&#xa;&#xa;WHERE cc.is_deleted &#x3d; 0 </sql>
+    <limit>0</limit>
+    <lookup/>
+    <execute_each_row>N</execute_each_row>
+    <variables_active>N</variables_active>
+    <lazy_conversion_active>N</lazy_conversion_active>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>416</xloc>
+      <xloc>112</xloc>
       <yloc>32</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
-    <name>Lookup payment instrument</name>
+    <name>Find New Contact</name>
     <type>DBLookup</type>
     <description/>
     <distribute>Y</distribute>
@@ -255,66 +277,40 @@
     <cache_size>0</cache_size>
     <lookup>
       <schema/>
-      <table>civicrm_option_value</table>
+      <table>civicrm_value_contact_id_history</table>
       <orderby/>
       <fail_on_multiple>N</fail_on_multiple>
       <eat_row_on_failure>N</eat_row_on_failure>
       <key>
-        <name>payment_option_group_id</name>
-        <field>option_group_id</field>
+        <name>contact_id</name>
+        <field>identifier</field>
         <condition>&#x3d;</condition>
         <name2/>
       </key>
       <key>
-        <name>payment_instrument</name>
-        <field>name</field>
+        <name>source_identity_name</name>
+        <field>identifier_type</field>
         <condition>&#x3d;</condition>
         <name2/>
       </key>
       <value>
-        <name>value</name>
-        <rename>new_payment_instrument_id</rename>
+        <name>entity_id</name>
+        <rename>new_contact_id</rename>
         <default>0</default>
         <type>Integer</type>
       </value>
     </lookup>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>784</xloc>
+      <xloc>432</xloc>
       <yloc>32</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
-    <name>Recurring Contributions</name>
-    <type>TableInput</type>
-    <description/>
-    <distribute>N</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>source</connection>
-    <sql>SELECT &#x2a; FROM&#xa;civicrm_contribution_recur cr&#xa;LEFT JOIN civicrm_contribution_recur_offline mafrc ON cr.id &#x3d; mafrc.recur_id &#xa;LEFT JOIN civicrm_contact cc ON cr.contact_id &#x3d; cc.id&#xa;WHERE mafrc.payment_type_id IN &#x28;2,3&#x29; AND cc.is_deleted &#x3d; 0</sql>
-    <limit>0</limit>
-    <lookup/>
-    <execute_each_row>N</execute_each_row>
-    <variables_active>N</variables_active>
-    <lazy_conversion_active>N</lazy_conversion_active>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>112</xloc>
-      <yloc>32</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Set avtale</name>
-    <type>Constant</type>
+    <name>New Contact Found</name>
+    <type>FilterRows</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -323,63 +319,26 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <fields>
-      <field>
-        <name>payment_instrument</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif>RCUR</nullif>
-        <length>-1</length>
-        <precision>-1</precision>
-        <set_empty_string>N</set_empty_string>
-      </field>
-    </fields>
+<send_true_to>Find New Contribution</send_true_to>
+<send_false_to>No New Contact Error</send_false_to>
+    <compare>
+<condition>
+ <negated>N</negated>
+ <leftvalue>new_contact_id</leftvalue>
+ <function>&#x3c;&#x3e;</function>
+ <rightvalue/>
+ <value><name>constant</name><type>Integer</type><text>0</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>&#x23;&#x3b;-&#x23;</mask></value> </condition>
+    </compare>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>576</xloc>
+      <xloc>592</xloc>
       <yloc>32</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
-    <name>Set printed</name>
-    <type>Constant</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <fields>
-      <field>
-        <name>payment_instrument</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif>maf_printed_giro</nullif>
-        <length>-1</length>
-        <precision>-1</precision>
-        <set_empty_string>N</set_empty_string>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>576</xloc>
-      <yloc>128</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Write migration recur</name>
+    <name>No New Contact Error</name>
     <type>TableOutput</type>
     <description/>
     <distribute>Y</distribute>
@@ -391,7 +350,186 @@
            </partitioning>
     <connection>destination</connection>
     <schema/>
-    <table>migration_recurring_contribution</table>
+    <table>error_soft_migration</table>
+    <commit>1000</commit>
+    <truncate>N</truncate>
+    <ignore_errors>N</ignore_errors>
+    <use_batch>Y</use_batch>
+    <specify_fields>Y</specify_fields>
+    <partitioning_enabled>N</partitioning_enabled>
+    <partitioning_field/>
+    <partitioning_daily>N</partitioning_daily>
+    <partitioning_monthly>Y</partitioning_monthly>
+    <tablename_in_field>N</tablename_in_field>
+    <tablename_field/>
+    <tablename_in_table>Y</tablename_in_table>
+    <return_keys>N</return_keys>
+    <return_field/>
+    <fields>
+        <field>
+          <column_name>error_message</column_name>
+          <stream_name>no_new_contact</stream_name>
+        </field>
+        <field>
+          <column_name>source_contact_id</column_name>
+          <stream_name>contact_id</stream_name>
+        </field>
+        <field>
+          <column_name>source_contribution_id</column_name>
+          <stream_name>contribution_id</stream_name>
+        </field>
+        <field>
+          <column_name>source_soft_id</column_name>
+          <stream_name>id</stream_name>
+        </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>592</xloc>
+      <yloc>160</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Find New Contribution</name>
+    <type>DBLookup</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>destination</connection>
+    <cache>N</cache>
+    <cache_load_all>N</cache_load_all>
+    <cache_size>0</cache_size>
+    <lookup>
+      <schema/>
+      <table>migration_contribution</table>
+      <orderby/>
+      <fail_on_multiple>N</fail_on_multiple>
+      <eat_row_on_failure>N</eat_row_on_failure>
+      <key>
+        <name>contribution_id</name>
+        <field>id</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>new_contribution_id</name>
+        <rename>new_contribution_id</rename>
+        <default>0</default>
+        <type>Integer</type>
+      </value>
+    </lookup>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>768</xloc>
+      <yloc>32</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>New Contribution Found</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<send_true_to>Add Soft</send_true_to>
+<send_false_to>No New Contribution Error</send_false_to>
+    <compare>
+<condition>
+ <negated>N</negated>
+ <leftvalue>new_contribution_id</leftvalue>
+ <function>&#x3c;&#x3e;</function>
+ <rightvalue/>
+ <value><name>constant</name><type>Integer</type><text>0</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>&#x23;&#x3b;-&#x23;</mask></value> </condition>
+    </compare>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>944</xloc>
+      <yloc>32</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>No New Contribution Error</name>
+    <type>TableOutput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>destination</connection>
+    <schema/>
+    <table>error_soft_migration</table>
+    <commit>1000</commit>
+    <truncate>N</truncate>
+    <ignore_errors>N</ignore_errors>
+    <use_batch>Y</use_batch>
+    <specify_fields>Y</specify_fields>
+    <partitioning_enabled>N</partitioning_enabled>
+    <partitioning_field/>
+    <partitioning_daily>N</partitioning_daily>
+    <partitioning_monthly>Y</partitioning_monthly>
+    <tablename_in_field>N</tablename_in_field>
+    <tablename_field/>
+    <tablename_in_table>Y</tablename_in_table>
+    <return_keys>N</return_keys>
+    <return_field/>
+    <fields>
+        <field>
+          <column_name>error_message</column_name>
+          <stream_name>no_new_contribution</stream_name>
+        </field>
+        <field>
+          <column_name>source_contact_id</column_name>
+          <stream_name>contact_id</stream_name>
+        </field>
+        <field>
+          <column_name>source_contribution_id</column_name>
+          <stream_name>contribution_id</stream_name>
+        </field>
+        <field>
+          <column_name>source_soft_id</column_name>
+          <stream_name>id</stream_name>
+        </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>944</xloc>
+      <yloc>160</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Add Soft</name>
+    <type>TableOutput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>destination</connection>
+    <schema/>
+    <table>migration_soft</table>
     <commit>1000</commit>
     <truncate>Y</truncate>
     <ignore_errors>N</ignore_errors>
@@ -408,6 +546,14 @@
     <return_field/>
     <fields>
         <field>
+          <column_name>id</column_name>
+          <stream_name>id</stream_name>
+        </field>
+        <field>
+          <column_name>contribution_id</column_name>
+          <stream_name>contribution_id</stream_name>
+        </field>
+        <field>
           <column_name>contact_id</column_name>
           <stream_name>contact_id</stream_name>
         </field>
@@ -420,117 +566,25 @@
           <stream_name>currency</stream_name>
         </field>
         <field>
-          <column_name>frequency_unit</column_name>
-          <stream_name>frequency_unit</stream_name>
+          <column_name>pcp_id</column_name>
+          <stream_name>pcp_id</stream_name>
         </field>
         <field>
-          <column_name>frequency_interval</column_name>
-          <stream_name>frequency_interval</stream_name>
+          <column_name>pcp_display_in_roll</column_name>
+          <stream_name>pcp_display_in_roll</stream_name>
         </field>
         <field>
-          <column_name>installments</column_name>
-          <stream_name>installments</stream_name>
+          <column_name>pcp_roll_nickname</column_name>
+          <stream_name>pcp_roll_nickname</stream_name>
         </field>
         <field>
-          <column_name>start_date</column_name>
-          <stream_name>start_date</stream_name>
-        </field>
-        <field>
-          <column_name>create_date</column_name>
-          <stream_name>create_date</stream_name>
-        </field>
-        <field>
-          <column_name>modified_date</column_name>
-          <stream_name>modified_date</stream_name>
-        </field>
-        <field>
-          <column_name>cancel_date</column_name>
-          <stream_name>cancel_date</stream_name>
-        </field>
-        <field>
-          <column_name>end_date</column_name>
-          <stream_name>end_date</stream_name>
-        </field>
-        <field>
-          <column_name>processor_id</column_name>
-          <stream_name>processor_id</stream_name>
-        </field>
-        <field>
-          <column_name>trxn_id</column_name>
-          <stream_name>trxn_id</stream_name>
-        </field>
-        <field>
-          <column_name>invoice_id</column_name>
-          <stream_name>invoice_id</stream_name>
-        </field>
-        <field>
-          <column_name>contribution_status_id</column_name>
-          <stream_name>contribution_status_id</stream_name>
-        </field>
-        <field>
-          <column_name>is_test</column_name>
-          <stream_name>is_test</stream_name>
-        </field>
-        <field>
-          <column_name>cycle_day</column_name>
-          <stream_name>cycle_day</stream_name>
-        </field>
-        <field>
-          <column_name>next_sched_contribution_date</column_name>
-          <stream_name>next_sched_contribution_date</stream_name>
-        </field>
-        <field>
-          <column_name>failure_count</column_name>
-          <stream_name>failure_count</stream_name>
-        </field>
-        <field>
-          <column_name>failure_retry_date</column_name>
-          <stream_name>failure_retry_date</stream_name>
-        </field>
-        <field>
-          <column_name>auto_renew</column_name>
-          <stream_name>auto_renew</stream_name>
-        </field>
-        <field>
-          <column_name>payment_processor_id</column_name>
-          <stream_name>payment_processor_id</stream_name>
-        </field>
-        <field>
-          <column_name>financial_type_id</column_name>
-          <stream_name>financial_type_id</stream_name>
-        </field>
-        <field>
-          <column_name>payment_instrument_id</column_name>
-          <stream_name>new_payment_instrument_id</stream_name>
-        </field>
-        <field>
-          <column_name>campaign_id</column_name>
-          <stream_name>campaign_id</stream_name>
-        </field>
-        <field>
-          <column_name>is_email_receipt</column_name>
-          <stream_name>is_email_receipt</stream_name>
-        </field>
-        <field>
-          <column_name>maximum_amount</column_name>
-          <stream_name>maximum_amount</stream_name>
-        </field>
-        <field>
-          <column_name>notification_for_bank</column_name>
-          <stream_name>notification_for_bank</stream_name>
-        </field>
-        <field>
-          <column_name>id</column_name>
-          <stream_name>recur_id</stream_name>
-        </field>
-        <field>
-          <column_name>payment_type_id</column_name>
-          <stream_name>payment_type_id</stream_name>
+          <column_name>pcp_personal_note</column_name>
+          <stream_name>pcp_personal_note</stream_name>
         </field>
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>960</xloc>
+      <xloc>1120</xloc>
       <yloc>32</yloc>
       <draw>Y</draw>
       </GUI>
